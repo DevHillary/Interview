@@ -1,0 +1,75 @@
+services:
+  # PostgreSQL Database
+  - type: pg
+    name: crm-database
+    databaseName: crm_db
+    user: crm_user
+    plan: free
+
+  # Redis Instance
+  - type: redis
+    name: crm-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+  # Django Backend
+  - type: web
+    name: crm-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt && cd backend && python manage.py collectstatic --noinput
+    startCommand: cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: DB_NAME
+        fromDatabase:
+          name: crm-database
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: crm-database
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: crm-database
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: crm-database
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: crm-database
+          property: port
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: crm-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          name: crm-redis
+          type: redis
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        sync: false
+
+  # Vue.js Frontend (Static Site)
+  - type: static
+    name: crm-frontend
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: NODE_VERSION
+        value: 18.18.0
+      # Note: VUE_APP_API_URL must be set manually after backend deployment
+      # Set it to: https://crm-backend.onrender.com
+      - key: VUE_APP_API_URL
+        sync: false
+

@@ -16,6 +16,7 @@ A modern, full-stack Customer Relationship Management (CRM) system built with Dj
 - [User Roles & Permissions](#-user-roles--permissions)
 - [Development Setup](#-development-setup)
 - [Environment Variables](#-environment-variables)
+- [Deployment](#-deployment)
 - [Sample Data](#-sample-data)
 - [License](#-license)
 
@@ -290,6 +291,41 @@ CORS_ALLOWED_ORIGINS=http://localhost:8080
 ```
 
 > **Note**: For production, set `DEBUG=False` and use a strong `SECRET_KEY`. Never commit `.env` files to version control.
+
+## 🚀 Deployment
+
+This application can be deployed to Render.com for free. See the [DEPLOYMENT.md](DEPLOYMENT.md) file for detailed deployment instructions.
+
+### Quick Deploy to Render.com
+
+1. **Push your code to GitHub** (already done if you're reading this)
+
+2. **Connect to Render**
+   - Sign up at https://render.com
+   - Go to Dashboard → "New +" → "Blueprint"
+   - Connect your GitHub repository: `DevHillary/Interview`
+   - Render will automatically detect `render.yaml` and configure all services
+
+3. **Configure Environment Variables**
+   - After deployment, update the backend service environment variables:
+     - `ALLOWED_HOSTS`: Your backend URL (e.g., `crm-backend.onrender.com`)
+     - `CORS_ALLOWED_ORIGINS`: Your frontend URL (e.g., `https://crm-frontend.onrender.com`)
+
+4. **Initialize Database**
+   - Go to backend service → "Shell"
+   - Run:
+     ```bash
+     python manage.py migrate
+     python manage.py createsuperuser
+     python create_sample_data.py
+     ```
+
+5. **Access Your Application**
+   - Frontend: `https://crm-frontend.onrender.com`
+   - Backend API: `https://crm-backend.onrender.com`
+   - API Docs: `https://crm-backend.onrender.com/swagger/`
+
+For detailed deployment instructions, troubleshooting, and alternative hosting options, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## 📊 Sample Data
 
