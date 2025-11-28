@@ -24,7 +24,8 @@ services:
         sync: false
       - key: DB_PORT
         sync: false
-      # Redis credentials - set these manually after creating Redis instance
+      # Redis/Celery (Optional - only needed for reminder notifications)
+      # Leave empty to disable Celery, or use a free Redis service like Upstash
       - key: CELERY_BROKER_URL
         sync: false
       - key: CELERY_RESULT_BACKEND

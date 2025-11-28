@@ -42,7 +42,7 @@ A modern, full-stack Customer Relationship Management (CRM) system built with Dj
 - **Framework**: Django 4.2
 - **API**: Django REST Framework
 - **Database**: PostgreSQL
-- **Task Queue**: Celery + Redis
+- **Task Queue**: Celery + Redis (Optional - for reminder notifications)
 - **Authentication**: JWT (JSON Web Tokens)
 
 ### Frontend
@@ -283,7 +283,7 @@ DB_PASSWORD=postgres
 DB_HOST=localhost
 DB_PORT=5432
 
-# Celery Configuration
+# Celery Configuration (Optional - leave empty to disable)
 CELERY_BROKER_URL=redis://localhost:6379/0
 
 # CORS Settings (if needed)

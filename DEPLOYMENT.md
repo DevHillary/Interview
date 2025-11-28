@@ -20,12 +20,14 @@ This guide will help you deploy the CRM system to Render.com for free.
    - Click "Create Database"
    - **Save the connection details** (Internal Database URL, Host, Port, Database, User, Password)
 
-2. **Create Redis Instance**
-   - Go to Render Dashboard → "New +" → "Redis"
-   - Name: `crm-redis`
-   - Plan: Free
-   - Click "Create Redis"
-   - **Save the connection string** (Internal Redis URL)
+2. **Create Redis Instance (Optional)**
+   - **Note:** Render.com doesn't offer Redis on the free tier
+   - **Option A:** Use a free Redis service like [Upstash](https://upstash.com/) (free tier available)
+     - Sign up at https://upstash.com
+     - Create a new Redis database
+     - Copy the REST URL or Redis URL
+   - **Option B:** Skip Redis - the app will work without it, but reminder notifications won't be sent automatically
+   - If using Upstash, save the connection URL
 
 3. **Deploy Web Services with Blueprint**
    - Go to https://dashboard.render.com
@@ -44,8 +46,9 @@ This guide will help you deploy the CRM system to Render.com for free.
      DB_PASSWORD=<from-postgres-password>
      DB_HOST=<from-postgres-host>
      DB_PORT=5432
-     CELERY_BROKER_URL=<from-redis-internal-url>
-     CELERY_RESULT_BACKEND=<from-redis-internal-url>
+     # Celery/Redis (Optional - leave empty to disable)
+     CELERY_BROKER_URL=<upstash-redis-url-or-leave-empty>
+     CELERY_RESULT_BACKEND=<upstash-redis-url-or-leave-empty>
      ALLOWED_HOSTS=crm-backend.onrender.com
      CORS_ALLOWED_ORIGINS=https://crm-frontend.onrender.com
      ```
@@ -78,13 +81,19 @@ This guide will help you deploy the CRM system to Render.com for free.
 4. Click "Create Database"
 5. Note down the connection details (you'll need them later)
 
-#### 2. Deploy Redis
+#### 2. Set Up Redis (Optional)
 
-1. Go to Render Dashboard → "New +" → "Redis"
-2. Name: `crm-redis`
-3. Plan: Free
-4. Click "Create Redis"
-5. Note down the connection string
+**Note:** Render.com doesn't offer Redis on the free tier. You have two options:
+
+**Option A: Use Upstash (Free Redis Service)**
+1. Go to https://upstash.com and sign up
+2. Create a new Redis database
+3. Copy the REST URL or Redis URL
+4. Use this URL for `CELERY_BROKER_URL` and `CELERY_RESULT_BACKEND`
+
+**Option B: Skip Redis**
+- Leave `CELERY_BROKER_URL` and `CELERY_RESULT_BACKEND` empty
+- The app will work, but reminder notifications won't be sent automatically
 
 #### 3. Deploy Django Backend
 
@@ -113,8 +122,9 @@ This guide will help you deploy the CRM system to Render.com for free.
    DB_PASSWORD=<from-postgres-service>
    DB_HOST=<from-postgres-service>
    DB_PORT=5432
-   CELERY_BROKER_URL=<from-redis-service>
-   CELERY_RESULT_BACKEND=<from-redis-service>
+   # Celery/Redis (Optional - use Upstash or leave empty)
+   CELERY_BROKER_URL=<upstash-redis-url-or-empty>
+   CELERY_RESULT_BACKEND=<upstash-redis-url-or-empty>
    ALLOWED_HOSTS=crm-backend.onrender.com
    CORS_ALLOWED_ORIGINS=https://crm-frontend.onrender.com
    ```
@@ -193,12 +203,17 @@ After running `create_sample_data.py`, you can login with:
 - Database has a 90-day retention limit on free tier
 - Limited to 750 hours/month total across all services
 
-### Celery Workers
+### Celery Workers (Optional)
 
-For production use, you may want to deploy Celery workers separately:
-1. Create a new "Background Worker" service
-2. Use the same environment variables as the backend
-3. Start command: `cd backend && celery -A config worker --loglevel=info`
+**Note:** Celery is optional. If you don't set up Redis, reminder notifications won't work automatically, but the rest of the app will function normally.
+
+If you want to enable reminder notifications:
+1. Set up a free Redis instance on Upstash (https://upstash.com)
+2. Add the Redis URL to backend environment variables
+3. (Optional) Deploy Celery workers separately:
+   - Create a new "Background Worker" service
+   - Use the same environment variables as the backend
+   - Start command: `cd backend && celery -A config worker --loglevel=info`
 
 ### Custom Domain (Optional)
 

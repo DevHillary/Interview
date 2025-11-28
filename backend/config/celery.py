@@ -1,4 +1,5 @@
 import os
+from django.conf import settings
 from celery import Celery
 from celery.schedules import crontab
 
@@ -11,16 +12,20 @@ app = Celery('crm')
 # the configuration object to child processes.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Load task modules from all registered Django apps.
-app.autodiscover_tasks()
+# Only configure Celery if broker URL is provided
+if settings.CELERY_BROKER_URL:
+    # Load task modules from all registered Django apps.
+    app.autodiscover_tasks()
 
-# Configure periodic tasks
-app.conf.beat_schedule = {
-    'check-reminders-every-minute': {
-        'task': 'crm.tasks.check_reminders',
-        'schedule': crontab(minute='*/1'),  # Run every minute
-    },
-}
+    # Configure periodic tasks
+    app.conf.beat_schedule = {
+        'check-reminders-every-minute': {
+            'task': 'crm.tasks.check_reminders',
+            'schedule': crontab(minute='*/1'),  # Run every minute
+        },
+    }
+else:
+    print("Warning: CELERY_BROKER_URL not set. Celery tasks will run synchronously.")
 
 
 @app.task(bind=True)
