@@ -1,6 +1,6 @@
 services:
   # PostgreSQL Database
-  - type: pg
+  - type: postgres
     name: crm-database
     databaseName: crm_db
     user: crm_user
