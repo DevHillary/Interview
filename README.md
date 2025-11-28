@@ -42,7 +42,7 @@ A modern, full-stack Customer Relationship Management (CRM) system built with Dj
 - **Framework**: Django 4.2
 - **API**: Django REST Framework
 - **Database**: PostgreSQL
-- **Task Queue**: Celery + Redis (Optional - for reminder notifications)
+- **Task Queue**: Celery + Redis
 - **Authentication**: JWT (JSON Web Tokens)
 
 ### Frontend
@@ -283,7 +283,7 @@ DB_PASSWORD=postgres
 DB_HOST=localhost
 DB_PORT=5432
 
-# Celery Configuration (Optional - leave empty to disable)
+# Celery Configuration
 CELERY_BROKER_URL=redis://localhost:6379/0
 
 # CORS Settings (if needed)
@@ -291,41 +291,6 @@ CORS_ALLOWED_ORIGINS=http://localhost:8080
 ```
 
 > **Note**: For production, set `DEBUG=False` and use a strong `SECRET_KEY`. Never commit `.env` files to version control.
-
-## 🚀 Deployment
-
-This application can be deployed to Render.com for free. See the [DEPLOYMENT.md](DEPLOYMENT.md) file for detailed deployment instructions.
-
-### Quick Deploy to Render.com
-
-1. **Push your code to GitHub** (already done if you're reading this)
-
-2. **Connect to Render**
-   - Sign up at https://render.com
-   - Go to Dashboard → "New +" → "Blueprint"
-   - Connect your GitHub repository: `DevHillary/Interview`
-   - Render will automatically detect `render.yaml` and configure all services
-
-3. **Configure Environment Variables**
-   - After deployment, update the backend service environment variables:
-     - `ALLOWED_HOSTS`: Your backend URL (e.g., `crm-backend.onrender.com`)
-     - `CORS_ALLOWED_ORIGINS`: Your frontend URL (e.g., `https://crm-frontend.onrender.com`)
-
-4. **Initialize Database**
-   - Go to backend service → "Shell"
-   - Run:
-     ```bash
-     python manage.py migrate
-     python manage.py createsuperuser
-     python create_sample_data.py
-     ```
-
-5. **Access Your Application**
-   - Frontend: `https://crm-frontend.onrender.com`
-   - Backend API: `https://crm-backend.onrender.com`
-   - API Docs: `https://crm-backend.onrender.com/swagger/`
-
-For detailed deployment instructions, troubleshooting, and alternative hosting options, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## 📊 Sample Data
 
@@ -336,6 +301,71 @@ The system automatically creates sample data on first startup, including:
 - Correspondence records
 
 All sample data uses Kenyan-based information for realistic testing scenarios.
+
+## 🚀 Deployment
+
+This application can be easily deployed to **Render.com** for free. Render provides free tiers for web services, PostgreSQL databases, Redis, and worker services.
+
+### Quick Deploy to Render.com
+
+1. **Push your code to GitHub** (already done if you're reading this)
+
+2. **Sign up for Render**
+   - Go to [https://render.com](https://render.com)
+   - Sign up with your GitHub account (free)
+
+3. **Create a New Blueprint**
+   - Click "New +" in the Render dashboard
+   - Select "Blueprint"
+   - Connect your GitHub repository: `DevHillary/Interview`
+   - Render will automatically detect the `render.yaml` file and configure all services
+
+4. **Configure Environment Variables**
+   After the initial deployment, you'll need to manually set one environment variable:
+   
+   **For the Frontend service (`crm-frontend`):**
+   - Go to the `crm-frontend` service settings
+   - Add environment variable:
+     - Key: `VUE_APP_API_URL`
+     - Value: `https://crm-backend.onrender.com` (replace with your actual backend URL)
+   
+   **For the Backend service (`crm-backend`):**
+   - Go to the `crm-backend` service settings
+   - Update the `ALLOWED_HOSTS` environment variable:
+     - Key: `ALLOWED_HOSTS`
+     - Value: `crm-backend.onrender.com` (replace with your actual backend URL)
+   - Update the `CORS_ALLOWED_ORIGINS` environment variable:
+     - Key: `CORS_ALLOWED_ORIGINS`
+     - Value: `https://crm-frontend.onrender.com` (replace with your actual frontend URL)
+
+5. **Wait for Deployment**
+   - Render will automatically build and deploy all services
+   - The first deployment may take 5-10 minutes
+   - You can monitor the build logs in the Render dashboard
+
+6. **Access Your Application**
+   - Frontend: `https://crm-frontend.onrender.com`
+   - Backend API: `https://crm-backend.onrender.com`
+   - API Documentation: `https://crm-backend.onrender.com/swagger/`
+
+### Important Notes
+
+- **Free Tier Limitations**: Render's free tier services spin down after 15 minutes of inactivity. The first request after spin-down may take 30-60 seconds to respond.
+- **Database**: The PostgreSQL database is automatically configured via the `render.yaml` file.
+- **Redis**: Redis is automatically configured for Celery task queue.
+- **Environment Variables**: Most environment variables are automatically configured, but you'll need to manually set `VUE_APP_API_URL`, `ALLOWED_HOSTS`, and `CORS_ALLOWED_ORIGINS` after the first deployment.
+- **HTTPS**: All services automatically get HTTPS certificates from Render.
+
+### Alternative: Manual Service Creation
+
+If you prefer to create services manually instead of using the Blueprint:
+
+1. Create a PostgreSQL database
+2. Create a Redis instance
+3. Create a Web Service for the backend (using `backend/Dockerfile`)
+4. Create Worker Services for Celery worker and beat
+5. Create a Web Service for the frontend (using `frontend/Dockerfile.prod`)
+6. Configure all environment variables manually
 
 ## 📄 License
 

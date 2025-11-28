@@ -19,10 +19,6 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = [host.strip() for host in config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')]
 
-# Add Render.com host if RENDER_EXTERNAL_HOSTNAME is set
-if config('RENDER_EXTERNAL_HOSTNAME', default=None):
-    ALLOWED_HOSTS.append(config('RENDER_EXTERNAL_HOSTNAME'))
-
 
 # Application definition
 
@@ -48,7 +44,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -119,7 +114,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -157,30 +151,20 @@ SIMPLE_JWT = {
 }
 
 # CORS settings
-# Allow CORS from environment variable or default to localhost
-if config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool):
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOWED_ORIGINS = [
-        origin.strip() 
-        for origin in config(
-            'CORS_ALLOWED_ORIGINS',
-            default='http://localhost:3000,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:8080'
-        ).split(',')
-    ]
+CORS_ALLOWED_ORIGINS = [
+    origin.strip() for origin in config(
+        'CORS_ALLOWED_ORIGINS',
+        default='http://localhost:3000,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:8080'
+    ).split(',')
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Celery Configuration (Optional - only needed for reminder notifications)
-# If CELERY_BROKER_URL is not set, Celery will be disabled
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=None)
+# Celery Configuration
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
-
-# Disable Celery if broker URL is not provided
-CELERY_TASK_ALWAYS_EAGER = CELERY_BROKER_URL is None
-CELERY_TASK_EAGER_PROPAGATES = True
 
