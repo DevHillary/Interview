@@ -29,13 +29,15 @@ This guide will help you deploy the CRM system to Render.com for free.
    - **Option B:** Skip Redis - the app will work without it, but reminder notifications won't be sent automatically
    - If using Upstash, save the connection URL
 
-3. **Deploy Web Services with Blueprint**
+3. **Deploy Backend with Blueprint**
    - Go to https://dashboard.render.com
    - Click "New +" → "Blueprint"
    - Connect your GitHub repository
    - Select the repository: `DevHillary/Interview`
-   - Render will automatically detect `render.yaml`
+   - Render will automatically detect `render.yaml` and create the backend service
    - Click "Apply"
+   
+   **Note:** The frontend must be deployed separately as a Static Site (see Step 4)
 
 4. **Configure Backend Environment Variables**
    - Go to the `crm-backend` service → "Environment"
@@ -141,6 +143,8 @@ This guide will help you deploy the CRM system to Render.com for free.
      ```
 
 #### 4. Deploy Vue.js Frontend
+
+**Note:** Static sites cannot be defined in render.yaml. Deploy manually:
 
 1. Go to Render Dashboard → "New +" → "Static Site"
 2. Connect your GitHub repository

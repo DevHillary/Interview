@@ -32,16 +32,3 @@ services:
         sync: false
       - key: ALLOWED_HOSTS
         sync: false
-
-  # Vue.js Frontend (Static Site)
-  - type: static
-    name: crm-frontend
-    plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: NODE_VERSION
-        value: 18.18.0
-      # Note: VUE_APP_API_URL must be set manually after backend deployment
-      - key: VUE_APP_API_URL
-        sync: false
