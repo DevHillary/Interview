@@ -1,17 +1,4 @@
 services:
-  # PostgreSQL Database
-  - type: postgres
-    name: crm-database
-    databaseName: crm_db
-    user: crm_user
-    plan: free
-
-  # Redis Instance
-  - type: redis
-    name: crm-redis
-    plan: free
-    maxmemoryPolicy: allkeys-lru
-
   # Django Backend
   - type: web
     name: crm-backend
@@ -26,36 +13,22 @@ services:
         generateValue: true
       - key: DEBUG
         value: False
+      # Database credentials - set these manually after creating PostgreSQL database
       - key: DB_NAME
-        fromDatabase:
-          name: crm-database
-          property: database
+        sync: false
       - key: DB_USER
-        fromDatabase:
-          name: crm-database
-          property: user
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase:
-          name: crm-database
-          property: password
+        sync: false
       - key: DB_HOST
-        fromDatabase:
-          name: crm-database
-          property: host
+        sync: false
       - key: DB_PORT
-        fromDatabase:
-          name: crm-database
-          property: port
+        sync: false
+      # Redis credentials - set these manually after creating Redis instance
       - key: CELERY_BROKER_URL
-        fromService:
-          name: crm-redis
-          type: redis
-          property: connectionString
+        sync: false
       - key: CELERY_RESULT_BACKEND
-        fromService:
-          name: crm-redis
-          type: redis
-          property: connectionString
+        sync: false
       - key: ALLOWED_HOSTS
         sync: false
 
@@ -69,7 +42,5 @@ services:
       - key: NODE_VERSION
         value: 18.18.0
       # Note: VUE_APP_API_URL must be set manually after backend deployment
-      # Set it to: https://crm-backend.onrender.com
       - key: VUE_APP_API_URL
         sync: false
-

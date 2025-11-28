@@ -9,16 +9,25 @@ This guide will help you deploy the CRM system to Render.com for free.
 
 ## Step-by-Step Deployment
 
-### Option 1: Automatic Deployment with render.yaml (Recommended)
+### Option 1: Deployment with render.yaml (Recommended)
 
-1. **Push your code to GitHub** (if not already done)
-   ```bash
-   git add .
-   git commit -m "Add deployment configuration"
-   git push
-   ```
+**Note:** Databases and Redis need to be created manually first, then connected to the web services.
 
-2. **Connect to Render**
+1. **Create PostgreSQL Database First**
+   - Go to Render Dashboard → "New +" → "PostgreSQL"
+   - Name: `crm-database`
+   - Plan: Free
+   - Click "Create Database"
+   - **Save the connection details** (Internal Database URL, Host, Port, Database, User, Password)
+
+2. **Create Redis Instance**
+   - Go to Render Dashboard → "New +" → "Redis"
+   - Name: `crm-redis`
+   - Plan: Free
+   - Click "Create Redis"
+   - **Save the connection string** (Internal Redis URL)
+
+3. **Deploy Web Services with Blueprint**
    - Go to https://dashboard.render.com
    - Click "New +" → "Blueprint"
    - Connect your GitHub repository
@@ -26,20 +35,32 @@ This guide will help you deploy the CRM system to Render.com for free.
    - Render will automatically detect `render.yaml`
    - Click "Apply"
 
-3. **Configure Environment Variables**
-   - After the blueprint is created, go to each service
-   - For the backend service, add these environment variables:
-     - `ALLOWED_HOSTS`: Your backend URL (e.g., `crm-backend.onrender.com`)
-     - `CORS_ALLOWED_ORIGINS`: Your frontend URL (e.g., `https://crm-frontend.onrender.com`)
-   - The database and Redis connections will be automatically configured
+4. **Configure Backend Environment Variables**
+   - Go to the `crm-backend` service → "Environment"
+   - Add/Update these variables:
+     ```
+     DB_NAME=<from-postgres-database-name>
+     DB_USER=<from-postgres-user>
+     DB_PASSWORD=<from-postgres-password>
+     DB_HOST=<from-postgres-host>
+     DB_PORT=5432
+     CELERY_BROKER_URL=<from-redis-internal-url>
+     CELERY_RESULT_BACKEND=<from-redis-internal-url>
+     ALLOWED_HOSTS=crm-backend.onrender.com
+     CORS_ALLOWED_ORIGINS=https://crm-frontend.onrender.com
+     ```
+   - Use the **Internal Database URL** and **Internal Redis URL** (not external URLs)
 
-4. **Wait for Deployment**
+5. **Configure Frontend Environment Variable**
+   - Go to the `crm-frontend` service → "Environment"
+   - Set: `VUE_APP_API_URL=https://crm-backend.onrender.com` (use your actual backend URL)
+
+6. **Wait for Deployment**
    - Render will build and deploy all services
    - This may take 5-10 minutes for the first deployment
 
-5. **Initialize Database**
-   - Once the backend is deployed, you need to run migrations and create sample data
-   - Go to the backend service → "Shell"
+7. **Initialize Database**
+   - Once the backend is deployed, go to backend service → "Shell"
    - Run:
      ```bash
      python manage.py migrate
