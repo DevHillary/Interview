@@ -2,6 +2,9 @@
 
 A modern, full-stack Customer Relationship Management (CRM) system built with Django REST Framework and Vue.js. This system provides comprehensive lead and contact management capabilities with role-based access control, automated reminders, and complete audit trails.
 
+**Developed by:** Hillary Chege  
+**Purpose:** Interview assessment project
+
 ## 📋 Table of Contents
 
 - [Features](#-features)
@@ -300,7 +303,7 @@ All sample data uses Kenyan-based information for realistic testing scenarios.
 
 ## 📄 License
 
-This project is for assessment purposes.
+This project is developed by **Hillary Chege** for interview-related purposes.
 
 ---
 
